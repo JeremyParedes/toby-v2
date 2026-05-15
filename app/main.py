@@ -269,3 +269,23 @@ async def youtube(data: dict):
     return {
         "url": f"https://www.youtube.com/watch?v={video_id}"
     }
+
+@app.post("/youtube-search")
+def youtube_search(data: dict):
+
+    query = data["query"]
+    api_key = os.getenv("YOUTUBE_API_KEY")
+
+    url = (
+        "https://www.googleapis.com/youtube/v3/search"
+        f"?part=snippet&q={query}&key={api_key}&type=video&maxResults=1"
+    )
+
+    response = requests.get(url)
+    result = response.json()
+
+    video_id = result["items"][0]["id"]["videoId"]
+
+    return {
+        "video_url": f"https://www.youtube.com/watch?v={video_id}"
+    }

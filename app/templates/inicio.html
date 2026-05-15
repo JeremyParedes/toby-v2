@@ -118,22 +118,12 @@ function actualizarRelojHUD() {
 setInterval(actualizarRelojHUD, 1000);
 actualizarRelojHUD();
 
-
-/* =========================
-   HABLAR
-========================== */
-
 function hablar(texto) {
     const voz = new SpeechSynthesisUtterance(texto);
     voz.lang = "es-ES";
     voz.rate = 1;
     speechSynthesis.speak(voz);
 }
-
-
-/* =========================
-   VOZ
-========================== */
 
 const reconocimiento =
     new (window.SpeechRecognition || window.webkitSpeechRecognition)();
@@ -145,8 +135,10 @@ reconocimiento.interimResults = false;
 reconocimiento.onresult = async function(event) {
 
     const texto = event.results[0][0].transcript;
-
     console.log("Usuario:", texto);
+
+    ejecutarComando(texto);
+    return;
 
     const respuesta = await fetch("/ia", {
         method: "POST",
@@ -159,17 +151,11 @@ reconocimiento.onresult = async function(event) {
     hablar(data.respuesta);
 };
 
+const btn = document.getElementById("btnAsistente");
 
-/* =========================
-   BOTÓN
-========================== */
-
-document.getElementById("btnAsistente")
-.addEventListener("click", () => {
+btn.addEventListener("click", () => {
     reconocimiento.start();
 });
-
-const btn = document.getElementById("btnAsistente");
 
 reconocimiento.onstart = () => {
     document.body.classList.add("listening");
@@ -177,68 +163,33 @@ reconocimiento.onstart = () => {
 
 reconocimiento.onend = () => {
     document.body.classList.remove("listening");
-};
+}
 
-btn.addEventListener("click", () => {
-    reconocimiento.start();
-});
-
-function ejecutarComando(texto) {
+async function ejecutarComando(texto) {
 
     texto = texto.toLowerCase();
 
-    // 🎵 YouTube con búsqueda
-    if (texto.includes("youtube")) {
+    if (texto.includes("reproduce") && texto.includes("youtube")) {
 
-        // quitamos palabras inútiles
-        let busqueda = texto
-            .replace("youtube", "")
-            .replace("reproduce", "")
-            .replace("pon", "")
+        let query = texto
+            .replace(/reproduce|youtube|en|la|el|de|música|musica|ahora/gi, "")
             .trim();
 
-        if (busqueda.length === 0) {
-            window.open("https://youtube.com", "_blank");
-        } else {
-            window.open(
-                `https://www.youtube.com/results?search_query=${encodeURIComponent(busqueda)}`,
-                "_blank"
-            );
-        }
+        const respuesta = await fetch("/youtube-search", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ query })
+        });
 
-        return true;
-    }
+        const data = await respuesta.json();
 
-    if (texto.includes("google")) {
-        window.open("https://google.com", "_blank");
+        window.open(data.video_url, "_blank");
+
         return true;
     }
 
     return false;
 }
-
-reconocimiento.onresult = async function(event) {
-
-    const texto = event.results[0][0].transcript;
-
-    console.log("Usuario:", texto);
-
-    // 👉 comandos locales primero
-    const ejecutado = ejecutarComando(texto);
-    if (ejecutado) return;
-
-    const respuesta = await fetch("/ia", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mensaje: texto })
-    });
-
-    const data = await respuesta.json();
-
-    hablar(data.respuesta);
-};
-
-
 </script>
 
 </body>
