@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <div id="pulse"></div>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>TOBY</title>
+
+    <link rel="stylesheet" href="/static/inicio.css">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+
+</head>     
+
+<body>
+
+    <div class="menu">
+
+        <div class="titulo">
+            <h1>TOBY</h1>
+        </div>
+
+        <div class="subtitulo">
+            <p>Sistema Financiero</p>
+        </div>
+
+        <a href="/banco">
+            <button class="menuBtn">
+                BANCO TOBY
+            </button>
+        </a>
+
+        <div class="orbit orbit1"></div>
+        <div class="orbit orbit2"></div>
+        <div class="orbit orbit3"></div>
+
+        <div class="radar-beam"></div>
+
+        <div class="smoke"></div>
+
+        <div class="radar"></div>
+        <div class="radar-grid"></div>
+
+        <div class="hud-ring"></div>
+        <div class="hud-ring2"></div>
+
+        <div id="mainHUD">
+
+            <div class="tom-panel">
+
+                <div class="tom-title">TOM</div>
+
+                <div class="tom-version">
+                    v1.2.9
+                </div>
+
+                <div class="tom-sub">
+                    TACTICAL OPERATING MATRIX
+                </div>
+
+            </div>
+
+            <div id="hud-clock">
+
+                <div id="clock-time"></div>
+
+                <div id="clock-date"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+<button id="btnAsistente">
+        INICIAR ASISTENTE
+</button>
+
+    <div class="particles">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="hud-circle"></div>
+
+    <script>
+/* =========================
+   RELOJ
+========================== */
+
+function actualizarRelojHUD() {
+    const ahora = new Date();
+
+    document.getElementById("clock-time").innerHTML =
+        ahora.toLocaleTimeString();
+
+    document.getElementById("clock-date").innerHTML =
+        ahora.toLocaleDateString("es-ES", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric"
+        });
+}
+
+setInterval(actualizarRelojHUD, 1000);
+actualizarRelojHUD();
+
+
+/* =========================
+   HABLAR
+========================== */
+
+function hablar(texto) {
+    const voz = new SpeechSynthesisUtterance(texto);
+    voz.lang = "es-ES";
+    voz.rate = 1;
+    speechSynthesis.speak(voz);
+}
+
+
+/* =========================
+   VOZ
+========================== */
+
+const reconocimiento =
+    new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+
+reconocimiento.lang = "es-ES";
+reconocimiento.continuous = false;
+reconocimiento.interimResults = false;
+
+reconocimiento.onresult = async function(event) {
+
+    const texto = event.results[0][0].transcript;
+
+    console.log("Usuario:", texto);
+
+    const respuesta = await fetch("/ia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mensaje: texto })
+    });
+
+    const data = await respuesta.json();
+
+    hablar(data.respuesta);
+};
+
+
+/* =========================
+   BOTÓN
+========================== */
+
+document.getElementById("btnAsistente")
+.addEventListener("click", () => {
+    reconocimiento.start();
+});
+
+const btn = document.getElementById("btnAsistente");
+
+reconocimiento.onstart = () => {
+    document.body.classList.add("listening");
+};
+
+reconocimiento.onend = () => {
+    document.body.classList.remove("listening");
+};
+
+btn.addEventListener("click", () => {
+    reconocimiento.start();
+});
+
+function ejecutarComando(texto) {
+
+    texto = texto.toLowerCase();
+
+    // 🎵 YouTube con búsqueda
+    if (texto.includes("youtube")) {
+
+        // quitamos palabras inútiles
+        let busqueda = texto
+            .replace("youtube", "")
+            .replace("reproduce", "")
+            .replace("pon", "")
+            .trim();
+
+        if (busqueda.length === 0) {
+            window.open("https://youtube.com", "_blank");
+        } else {
+            window.open(
+                `https://www.youtube.com/results?search_query=${encodeURIComponent(busqueda)}`,
+                "_blank"
+            );
+        }
+
+        return true;
+    }
+
+    if (texto.includes("google")) {
+        window.open("https://google.com", "_blank");
+        return true;
+    }
+
+    return false;
+}
+
+reconocimiento.onresult = async function(event) {
+
+    const texto = event.results[0][0].transcript;
+
+    console.log("Usuario:", texto);
+
+    // 👉 comandos locales primero
+    const ejecutado = ejecutarComando(texto);
+    if (ejecutado) return;
+
+    const respuesta = await fetch("/ia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mensaje: texto })
+    });
+
+    const data = await respuesta.json();
+
+    hablar(data.respuesta);
+};
+
+
+</script>
+
+</body>
+
+</html>

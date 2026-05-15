@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>TOBY</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+    <div class="card">
+        <h3>Clientes</h3>
+        <p id="clientes">0</p>
+    </div>
+
+    <div class="card">
+        <h3>Total Prestado</h3>
+        <p id="prestado">S/0</p>
+    </div>
+
+    <div class="card">
+        <h3>Total Pagado</h3>
+        <p id="pagado">S/0</p>
+    </div>
+
+    <div class="card">
+        <h3>Pendiente</h3>
+        <p id="pendiente">S/0</p>
+    </div>
+
+    <div class="card">
+        <h3>Ganancia</h3>
+        <p id="ganancia">S/0</p>
+    </div>
+
+
+</div>
+
+<h1>TOBY - Sistema de Préstamos</h1>
+
+    <form id="formPrestamo">
+
+        <input type="text"
+               id="cliente"
+               placeholder="Cliente"
+               required>
+
+        <input type="number"
+               id="monto"
+               placeholder="Monto"
+               required>
+
+        <input type="number"
+               id="interes"
+               placeholder="Interés %"
+               required>
+
+        <button type="submit">
+            Agregar Préstamo
+        </button>
+
+    </form>
+<br>
+
+<input
+    type="text"
+    id="busqueda"
+    placeholder="🔍 Buscar cliente..."
+    onkeyup="buscarCliente()"
+>
+    <table id="tablaPrestamos">
+
+        <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Monto</th>
+                    <th>Interés</th>
+                    <th>Ganancia</th>
+                    <th>Deuda</th>
+                    <th>Pagado</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+        </thead>
+
+        <tbody id="tabla"></tbody>
+
+    </table>
+
+<script src="/static/app.js"></script>
+
+</body>
+</html>
