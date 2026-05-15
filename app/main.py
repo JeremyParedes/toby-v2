@@ -1,3 +1,6 @@
+from fastapi.responses import RedirectResponse
+from fastapi import Form
+from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
 import os
 import requests
@@ -18,6 +21,15 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key="supersecretkey123",
+    max_age=0  # 👈 clave
+)
+
+USUARIO = "admin"
+PASSWORD = "1234"
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 templates = Jinja2Templates(directory="app/templates")
@@ -49,6 +61,9 @@ def inicio(request: Request):
 
 @app.get("/banco")
 def banco(request: Request):
+
+    if "user" not in request.session:
+        return RedirectResponse("/login")
 
     return templates.TemplateResponse(
         request=request,
@@ -231,16 +246,16 @@ async def ia(request: Request):
         model="llama-3.3-70b-versatile",
         messages=[
                  {
-                    "role": "system",
-                    "content": """
-                Eres TOBY.
+                      "role": "system",
+                        "content": """
+                        Eres TOM.
 
-                Responde:
-                - máximo 10 a 20 palabras
-                - directo
-                - sin explicaciones
-                - estilo comando militar / IA
-                """
+                        Responde:
+                        - máximo 10 a 20 palabras
+                        - directo
+                        - sin explicaciones
+                        - estilo comando militar / IA
+                        """
                 }
         ]
     )
@@ -289,3 +304,24 @@ def youtube_search(data: dict):
     return {
         "video_url": f"https://www.youtube.com/watch?v={video_id}"
     }
+
+@app.get("/login")
+def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+@app.get("/logout")
+def logout(request: Request):
+    request.session.clear()
+    return {"mensaje": "Sesión cerrada"}
+def verificar_login(request: Request):
+    if "user" not in request.session:
+        raise HTTPException(status_code=401, detail="No autorizado")
+
+@app.post("/login")
+def login(request: Request, username: str = Form(...), password: str = Form(...)):
+
+    if username == USUARIO and password == PASSWORD:
+        request.session["user"] = username
+        return RedirectResponse("/banco", status_code=302)
+
+    return RedirectResponse("/login", status_code=302)    

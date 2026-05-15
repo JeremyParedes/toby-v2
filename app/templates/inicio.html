@@ -137,14 +137,28 @@ reconocimiento.onresult = async function(event) {
     const texto = event.results[0][0].transcript;
     console.log("Usuario:", texto);
 
-    ejecutarComando(texto);
-    return;
+    // 🔥 comandos primero
+    const esComando = ejecutarComando(texto);
+
+    if (esComando) return;
+
+    // 🤖 IA
+    try {
 
     const respuesta = await fetch("/ia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mensaje: texto })
     });
+
+            const data = await respuesta.json();
+
+            hablar(data.respuesta);
+
+        } catch (error) {
+            console.log("Error IA:", error);
+            hablar("Error en IA");
+        }
 
     const data = await respuesta.json();
 
@@ -163,7 +177,8 @@ reconocimiento.onstart = () => {
 
 reconocimiento.onend = () => {
     document.body.classList.remove("listening");
-}
+    console.log("mic cerrado");
+};
 
 async function ejecutarComando(texto) {
 
@@ -171,9 +186,20 @@ async function ejecutarComando(texto) {
 
     if (texto.includes("reproduce") && texto.includes("youtube")) {
 
-        let query = texto
-            .replace(/reproduce|youtube|en|la|el|de|música|musica|ahora/gi, "")
+        let query = texto;
+
+        // 🧠 limpieza básica
+        query = query
+            .replace(/reproduce|youtube|en|la|el|de|música|musica|ahora|pon|quiero/gi, "")
             .trim();
+
+        // 🧠 detección de intención
+        if (texto.includes("mejor")) query += " mix";
+        if (texto.includes("triste")) query += " sad playlist";
+        if (texto.includes("motivar")) query += " motivation";
+        if (texto.includes("relaj")) query += " chill music";
+        if (texto.includes("bad bunny")) query += " official audio";
+        if (texto.includes("canserbero")) query += " lyrics";
 
         const respuesta = await fetch("/youtube-search", {
             method: "POST",
