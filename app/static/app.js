@@ -16,8 +16,8 @@ async function cargarPrestamos() {
                 <td>${p.cliente}</td>
                 <td>S/${p.monto}</td>
                 <td>${p.interes}%</td>
-                <td>S/${p.deuda_total - p.monto}</td>
-                <td>S/${p.deuda_total}</td>
+                <td>S/${p.deuda + p.pagado}</td>
+                <td>S/${p.deuda}</td>
                 <td>S/${p.pagado}</td>
                 <td>${p.estado}</td>
 

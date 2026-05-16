@@ -99,9 +99,30 @@ def crear_prestamo(
     return nuevo_prestamo
 
 # Ver todos
+# Ver todos
 @app.get("/prestamos")
 def listar_prestamos(db: Session = Depends(get_db)):
-    return db.query(Prestamo).all()
+
+    prestamos = db.query(Prestamo).all()
+
+    resultado = []
+
+    for p in prestamos:
+
+        restante = p.deuda_total - p.pagado
+
+        resultado.append({
+            "id": p.id,
+            "cliente": p.cliente,
+            "monto": p.monto,
+            "interes": p.interes,
+            "ganancia": p.deuda_total - p.monto,
+            "deuda": restante,
+            "pagado": p.pagado,
+            "estado": p.estado
+        })
+
+    return resultado
 
 # Buscar cliente
 @app.get("/prestamos/{cliente}")
