@@ -25,7 +25,8 @@ app = FastAPI()
 app.add_middleware(
     SessionMiddleware,
     secret_key="supersecretkey123",
-    max_age=300
+    max_age=300,
+    https_only=True
 )
 
 USUARIO = "admin"
@@ -318,10 +319,24 @@ def verificar_login(request: Request):
         raise HTTPException(status_code=401, detail="No autorizado")
 
 @app.post("/login")
-def login(request: Request, username: str = Form(...), password: str = Form(...)):
+def login(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...)
+):
 
     if username == USUARIO and password == PASSWORD:
-        request.session["user"] = username
-        return RedirectResponse("/banco", status_code=302)
 
-    return RedirectResponse("/login", status_code=302)    
+        request.session["user"] = username
+
+        response = RedirectResponse(
+            url="/banco",
+            status_code=302
+        )
+
+        return response
+
+    return RedirectResponse(
+        url="/login",
+        status_code=302
+    )   
