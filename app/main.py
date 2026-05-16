@@ -64,8 +64,8 @@ def banco(request: Request):
 
     if "user" not in request.session:
         return RedirectResponse(
-    url="/login",
-    status_code=302
+        url="/login",
+        status_code=302
 )
 
     return templates.TemplateResponse(
