@@ -25,7 +25,7 @@ app = FastAPI()
 app.add_middleware(
     SessionMiddleware,
     secret_key="supersecretkey123",
-    max_age=60  # 👈 clave
+    max_age=300
 )
 
 USUARIO = "admin"
