@@ -9,13 +9,19 @@ from telegram.ext import (
     ContextTypes
 )
 
-TOKEN = "8789061664:AAF6lz_JSlbnT2rlTrL_qpemqSQZGrggiPk"
+import os
+
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+
+ADMIN_ID = 123456789
 
 
 async def inicio(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
+
+    print(update.effective_chat.id)
 
     await update.message.reply_text(
         "TOBY activo 😎"
@@ -27,7 +33,14 @@ async def cliente(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE
 ):
+    if update.effective_chat.id != ADMIN_ID:
 
+        await update.message.reply_text(
+            "No autorizado"
+        )
+
+        return
+    
     if not context.args:
 
         await update.message.reply_text(
