@@ -28,7 +28,7 @@ app.add_middleware(
     max_age=300,
 )
 
-USUARIO = "admin"
+USUARIO = "luis"
 PASSWORD = "1234"
 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
