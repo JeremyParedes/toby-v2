@@ -54,9 +54,9 @@ def get_db():
 def inicio(request: Request):
 
     return templates.TemplateResponse(
-    "inicio.html",
-    {"request": request}
-)
+        request=request,
+        name="inicio.html"
+    )
 
 
 @app.get("/banco")
