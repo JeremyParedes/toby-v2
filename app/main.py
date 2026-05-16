@@ -25,7 +25,7 @@ app = FastAPI()
 app.add_middleware(
     SessionMiddleware,
     secret_key="supersecretkey123",
-    max_age=0  # 👈 clave
+    max_age=60  # 👈 clave
 )
 
 USUARIO = "admin"
@@ -54,9 +54,9 @@ def get_db():
 def inicio(request: Request):
 
     return templates.TemplateResponse(
-        request=request,
-        name="inicio.html"
-    )
+    "inicio.html",
+    {"request": request}
+)
 
 
 @app.get("/banco")
