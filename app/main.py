@@ -26,7 +26,6 @@ app.add_middleware(
     SessionMiddleware,
     secret_key="supersecretkey123",
     max_age=300,
-    https_only=True
 )
 
 USUARIO = "admin"
@@ -64,7 +63,10 @@ def inicio(request: Request):
 def banco(request: Request):
 
     if "user" not in request.session:
-        return RedirectResponse("/login")
+        return RedirectResponse(
+    url="/login",
+    status_code=302
+)
 
     return templates.TemplateResponse(
         request=request,
@@ -308,7 +310,11 @@ def youtube_search(data: dict):
 
 @app.get("/login")
 def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html"
+    )
 
 @app.get("/logout")
 def logout(request: Request):
