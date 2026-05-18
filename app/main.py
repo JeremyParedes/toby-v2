@@ -239,21 +239,16 @@ def dashboard(db: Session = Depends(get_db)):
 
     for p in prestamos:
 
-        total_dinero_prestado += p.monto
-        
-        total_prestado += p.deuda_total
+        monto = p.monto or 0
+        deuda_total = p.deuda_total or 0
+        pagado = p.pagado or 0
 
-        total_pagado += p.pagado
+        total_dinero_prestado += monto
+        total_prestado += deuda_total
+        total_pagado += pagado
+        total_pendiente += (deuda_total - pagado)
 
-        total_pendiente += (
-            p.deuda_total - p.pagado
-        )
-
-        ganancia = (
-            p.deuda_total - p.monto
-        )
-
-        total_ganancia += ganancia
+        total_ganancia += (deuda_total - monto)
 
     return {
         "clientes": len(prestamos),
