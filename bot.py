@@ -109,6 +109,6 @@ app.add_handler(
     CommandHandler("cliente", cliente)
 )
 
-print("BOT TOBY ENCENDIDO 😎")
-
-app.run_polling()
+if __name__ == "__main__":
+    print("BOT TOBY ENCENDIDO 😎")
+    app.run_polling()
