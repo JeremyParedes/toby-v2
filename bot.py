@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-ADMIN_ID = 123456789
+ADMIN_ID = 7790388507
 
 
 # =========================
