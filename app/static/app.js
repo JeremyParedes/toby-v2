@@ -177,6 +177,10 @@ async function cargarDashboard(){
     .innerText = datos.clientes
 
     document
+    .getElementById('dineroPrestado')
+    .innerText = `S/${datos.dinero_prestado}`
+
+    document
     .getElementById('prestado')
     .innerText = `S/${datos.prestado}`
 

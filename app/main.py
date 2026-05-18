@@ -232,12 +232,15 @@ def dashboard(db: Session = Depends(get_db)):
     prestamos = db.query(Prestamo).all()
 
     total_prestado = 0
+    total_dinero_prestado = 0
     total_pagado = 0
     total_pendiente = 0
     total_ganancia = 0
 
     for p in prestamos:
 
+        total_dinero_prestado += p.monto
+        
         total_prestado += p.deuda_total
 
         total_pagado += p.pagado
@@ -254,6 +257,7 @@ def dashboard(db: Session = Depends(get_db)):
 
     return {
         "clientes": len(prestamos),
+        "dinero_prestado": total_dinero_prestado,
         "prestado": total_prestado,
         "pagado": total_pagado,
         "pendiente": total_pendiente,
