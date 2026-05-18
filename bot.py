@@ -1,4 +1,5 @@
 import os
+import asyncio
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
@@ -6,11 +7,17 @@ TOKEN = os.getenv("TELEGRAM_TOKEN")
 ADMIN_ID = [7790388507, 8372332318]
 
 
+# =========================
+# START
+# =========================
 async def inicio(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(update.effective_chat.id)
     await update.message.reply_text("TOBY activo 😎")
 
 
+# =========================
+# CLIENTE
+# =========================
 async def cliente(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     from app.database import SessionLocal
@@ -66,12 +73,37 @@ Estado: {prestamo.estado}
         db.close()
 
 
-app = ApplicationBuilder().token(TOKEN).build()
+# =========================
+# WEBHOOK (RAILWAY)
+# =========================
+PORT = int(os.environ.get("PORT", 8000))
 
-app.add_handler(CommandHandler("start", inicio))
-app.add_handler(CommandHandler("cliente", cliente))
+
+async def main():
+    app = ApplicationBuilder().token(TOKEN).build()
+
+    app.add_handler(CommandHandler("start", inicio))
+    app.add_handler(CommandHandler("cliente", cliente))
+
+    await app.initialize()
+
+    # 🔥 IMPORTANTE: webhook en Railway
+    await app.bot.set_webhook(
+        url=f"https://TU-APP.up.railway.app/{TOKEN}"
+    )
+
+    await app.start()
+
+    await app.updater.start_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        url_path=TOKEN
+    )
+
+    print("BOT EN WEBHOOK ACTIVO 😎")
+
+    await asyncio.Event().wait()
 
 
 if __name__ == "__main__":
-    print("BOT TOBY ENCENDIDO 😎")
-    app.run_polling()
+    asyncio.run(main())
