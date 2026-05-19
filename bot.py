@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
-ADMIN_ID = [7790388507, 8372332318]
+ADMIN_ID = [7790388507, 8372332318, 8949897778]
 
 
 async def inicio(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -33,7 +33,7 @@ async def cliente(update: Update, context: ContextTypes.DEFAULT_TYPE):
             Prestamo.cliente == nombre
         ).first()
 
-        if not prestamo:
+        if not prestamo: 
             await update.message.reply_text("Cliente no encontrado")
             return
 
